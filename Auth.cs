@@ -35,6 +35,7 @@ namespace _4digit_guess
                         Login();
                         break;
                     case "0":
+                        Environment.Exit(0);
                         return;
                     default:
                         Console.WriteLine("Неверный выбор. Попробуйте еще раз.");
