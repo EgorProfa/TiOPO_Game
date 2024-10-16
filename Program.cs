@@ -22,7 +22,7 @@ namespace _4digit_guess
             {                
                 Console.Write("Введите ваше число: ");
                 string userInput = Console.ReadLine();
-
+                HashSet<string> contains = new HashSet<string>(); 
                 if (HasZero(int.Parse(userInput)) || (userInput.Length != 4))
                 {
                     Console.WriteLine("Некорректный ввод. Пожалуйста, введите четырехзначное число без 0 и повторяющихся цифр.");
@@ -40,10 +40,10 @@ namespace _4digit_guess
                     }
                     if (secretNumber.ToString().Contains(userInput[i]))
                     {
-                        correctDigit++;
+                        contains.Add(userInput[i].ToString());
                     }
                 }
-
+                correctDigit = contains.Count;
                 if (correctPosition == 4)
                 {
                     Console.WriteLine($"Вы угадали число {secretNumber} за {attempts} попыток.");
