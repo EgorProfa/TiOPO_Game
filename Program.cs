@@ -17,15 +17,14 @@ namespace _4digit_guess
         /// </summary>
         static void Main()
         {
+            // Генерация случайного числа
             int _secretNumber = GenNumber();
-            Console.WriteLine(_secretNumber);
+
 #if DEBUG
-            
-            User _user = new User("admin", "admin");
-#else
+            Console.WriteLine(_secretNumber);
+#endif
             Auth _userAuth = new Auth("Файлы/logins.json");
             _userAuth.Authenth();
-#endif
 
             int _attempts = 0;
             Console.WriteLine("Угадайте четырехзначное число (без 0 и повторяющихся цифр):");
@@ -58,11 +57,7 @@ namespace _4digit_guess
                 if (_correctPosition == 4)
                 {
                     Console.WriteLine($"Вы угадали число {_secretNumber} за {_attempts} попыток.");
-# if DEBUG
                     UpdateLeaderboard(_user.Username, _attempts);
-#else
-                    UpdateLeaderboard(_userAuth.GetCurrentUsername(), _attempts);
-#endif
                     Console.ReadKey();
                     break;
                 }
