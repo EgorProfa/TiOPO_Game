@@ -118,14 +118,13 @@ namespace _4digit_guess
         /// Метод, реализующий десериализацию пользователей
         /// </summary>
         /// <returns>Список всех пользователей</returns>
-        /// <exception cref="FileNotFoundException">Ошибка: файл не найден</exception>
         private List<User> LoadUsers()
         {
             if (!File.Exists(filePath))
             {
-                throw new FileNotFoundException();
+                return new List<User>();
             }
-            string _json = File.ReadAllText(filePath);
+
             string text = File.ReadAllText(filePath);
             if (text.Length == 0)
             {

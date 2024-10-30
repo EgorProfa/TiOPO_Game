@@ -23,7 +23,7 @@ namespace _4digit_guess
 #if DEBUG
             Console.WriteLine(_secretNumber);
 #endif
-            Auth _userAuth = new Auth("Файлы/logins.json");
+            Auth _userAuth = new Auth(FormPath("logins.json"));
             _userAuth.Authenth();
 
             int _attempts = 0;
@@ -115,7 +115,7 @@ namespace _4digit_guess
         /// <param name="attempts">Количество попыток текущего игрока</param>
         public static void UpdateLeaderboard(string _playerName, int _attempts)
         {
-            string _filePath = "Файлы/Leaderboard.txt";
+            string _filePath = FormPath("LeaderBoard.txt");
             List<LeaderInfo> _leaderboard = new List<LeaderInfo>();
 
             // Чтение списка лидеров
@@ -173,6 +173,21 @@ namespace _4digit_guess
             }
             else { _percentage = 1; }
             return _percentage;
+        }
+        
+        /// <summary>
+        /// Формирование пути до файла, чтобы не читать файлы из bin
+        /// </summary>
+        /// <param name="_file"></param>
+        /// <returns></returns>
+        public static string FormPath(string _file)
+        {
+            string _projectPath = Directory.GetParent(AppDomain.CurrentDomain.BaseDirectory).Parent.Parent.FullName;
+
+            string _relativeFilePath = $"Файлы\\{_file}";
+
+            string _fullPath = Path.Combine(_projectPath, _relativeFilePath);
+            return _fullPath;
         }
     }
 }
