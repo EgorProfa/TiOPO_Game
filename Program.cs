@@ -2,136 +2,182 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 
 namespace _4digit_guess
 {
+    /// <summary>
+    /// Программа, реализующая игру "Быки и Коровы"
+    /// в консольном виде
+    /// </summary>
     internal class Program
     {
+        /// <summary>
+        /// Основной метод, в котором происходит
+        /// отгадывание загаданного числа
+        /// </summary>
         static void Main()
         {
-            int secretNumber = GenNumber();
-            Console.WriteLine(secretNumber);
-            int attempts = 0;
+            int _secretNumber = GenNumber();
+            Console.WriteLine(_secretNumber);
+#if DEBUG
+            
+            User _user = new User("admin", "admin");
+#else
+            Auth _userAuth = new Auth("Файлы/logins.json");
+            _userAuth.Authenth();
+#endif
 
-            Auth userAuth = new Auth("logins.json");
-            userAuth.Authenth();
-
+            int _attempts = 0;
             Console.WriteLine("Угадайте четырехзначное число (без 0 и повторяющихся цифр):");
             while (true)
             {                
                 Console.Write("Введите ваше число: ");
-                string userInput = Console.ReadLine();
-                HashSet<string> contains = new HashSet<string>(); 
-                if (HasZero(int.Parse(userInput)) || (userInput.Length != 4))
+                string _userInput = Console.ReadLine();
+                HashSet<string> _contains = new HashSet<string>(); 
+                if (HasZero(int.Parse(_userInput)) || (_userInput.Length != 4))
                 {
                     Console.WriteLine("Некорректный ввод. Пожалуйста, введите четырехзначное число без 0 и повторяющихся цифр.");
                     continue;
                 }
 
-                attempts++;
-                int correctPosition = 0, correctDigit = 0;
+                _attempts++;
+                int _correctPosition = 0, _correctDigit = 0;
 
                 for (int i = 0; i < 4; i++)
                 {
-                    if (userInput[i] == secretNumber.ToString()[i])
+                    if (_userInput[i] == _secretNumber.ToString()[i])
                     {
-                        correctPosition++;
+                        _correctPosition++;
                     }
-                    if (secretNumber.ToString().Contains(userInput[i]))
+                    if (_secretNumber.ToString().Contains(_userInput[i]))
                     {
-                        contains.Add(userInput[i].ToString());
+                        _contains.Add(_userInput[i].ToString());
                     }
                 }
-                correctDigit = contains.Count;
-                if (correctPosition == 4)
+                _correctDigit = _contains.Count;
+                if (_correctPosition == 4)
                 {
-                    Console.WriteLine($"Вы угадали число {secretNumber} за {attempts} попыток.");
-                    UpdateLeaderboard(userAuth.GetCurrentUsername(), attempts);
+                    Console.WriteLine($"Вы угадали число {_secretNumber} за {_attempts} попыток.");
+# if DEBUG
+                    UpdateLeaderboard(_user.Username, _attempts);
+#else
+                    UpdateLeaderboard(_userAuth.GetCurrentUsername(), _attempts);
+#endif
                     Console.ReadKey();
                     break;
                 }
                 else
                 {
-                    Console.WriteLine($"Цифры на своих позициях: {correctPosition}, цифры в числе: {correctDigit}");
+                    Console.WriteLine($"Цифры на своих позициях: {_correctPosition}, цифры в числе: {_correctDigit}");
                 }
             }
         }
 
+        /// <summary>
+        /// Метод, реализующий генерацию числа без
+        /// нулей и повторяющихся цифр от 1000 до 9999
+        /// </summary>
+        /// <returns>Число от 1000 до 9999 без 0 и повт. цифр</returns>
         public static int GenNumber()
         {
-            Random random = new Random();
-            int number;
+            Random _random = new Random();
+            int _number;
             do
             {
-                number = random.Next(1000, 10000);
-            } while (HasZero(number) || HasDuplicateDigits(number));
+                _number = _random.Next(1000, 10000);
+            } while (HasZero(_number) || HasDuplicateDigits(_number));
 
-            return number;
+            return _number;
         }
 
-        public static bool HasZero(int number)
+        /// <summary>
+        /// Проверка числа на наличие нуля
+        /// </summary>
+        /// <param name="number">Загаданное число</param>
+        /// <returns>True, если есть 0; false, если 0 отсутствует</returns>
+        public static bool HasZero(int _number)
         {
-            return number.ToString().Contains('0');
+            return _number.ToString().Contains('0');
         }
 
-        public static bool HasDuplicateDigits(int number)
+        /// <summary>
+        /// Проверка числа на повторяющиеся цифры
+        /// </summary>
+        /// <param name="number">Загаданное число</param>
+        /// <returns>True, если есть повторяющиеся цифры; false, 
+        /// если нет повторяющихся цифр</returns>
+        public static bool HasDuplicateDigits(int _number)
         {
-            string numStr = number.ToString();
-            return numStr.Length != new HashSet<char>(numStr).Count;
+            string _numStr = _number.ToString();
+            return _numStr.Length != new HashSet<char>(_numStr).Count;
         }
 
-        public static void UpdateLeaderboard(string playerName, int attempts)
+        /// <summary>
+        /// Метод, динамически обновляющий таблицу
+        /// лидеров и записывающий ее в файл
+        /// </summary>
+        /// <param name="playerName">Имя текущего игрока</param>
+        /// <param name="attempts">Количество попыток текущего игрока</param>
+        public static void UpdateLeaderboard(string _playerName, int _attempts)
         {
-            string filePath = "Leaderboard.txt";
-            List<LeaderInfo> leaderboard = new List<LeaderInfo>();
+            string _filePath = "Файлы/Leaderboard.txt";
+            List<LeaderInfo> _leaderboard = new List<LeaderInfo>();
 
-            if (File.Exists(filePath))
+            // Чтение списка лидеров
+            if (File.Exists(_filePath))
             {
-                string[] lines = File.ReadAllLines(filePath);
-                foreach (string line in lines)
+                string[] _lines = File.ReadAllLines(_filePath);
+                foreach (string _line in _lines)
                 {
-                    if (line.Any())
+                    if (_line.Any())
                     {
-                        string[] values = line.Split(',');
-                        leaderboard.Add(new LeaderInfo { Name = values[0], Score = int.Parse(values[1]), Date = DateTime.Parse(values[2])});
+                        string[] _values = _line.Split(',');
+                        _leaderboard.Add(new LeaderInfo { Name = _values[0], Score = int.Parse(_values[1]), Date = DateTime.Parse(_values[2])});
                     }                                    
                 }               
             }
 
-            leaderboard.Add(new LeaderInfo { Name = playerName, Score = attempts, Date = DateTime.Now });
+            // Добавление текущего игрока в список лидеров
+            _leaderboard.Add(new LeaderInfo { Name = _playerName, Score = _attempts, Date = DateTime.Now });
 
-            using (StreamWriter writer = new StreamWriter(filePath))
+            // Запись обновленной таблицы лидеров в файл
+            using (StreamWriter _writer = new StreamWriter(_filePath))
             {
-                foreach (LeaderInfo leader in leaderboard)
+                foreach (LeaderInfo _leader in _leaderboard)
                 {
-                    double topPercentage = CalculateTopPercentage(leaderboard, leader.Score);
-                    writer.WriteLine($"{leader.Name}, {leader.Score}, {leader.Date}, {topPercentage}%.");
+                    double _topPercentage = CalculateTopPercentage(_leaderboard, _leader.Score);
+                    _writer.WriteLine($"{_leader.Name}, {_leader.Score}, {_leader.Date}, {_topPercentage}%.");
                 }
             }
 
             Console.WriteLine($"Ваш результат записан в таблице лидеров.");
         }
 
-        public static double CalculateTopPercentage(List<LeaderInfo> leaderboard, int newAttempts)
+        /// <summary>
+        /// Метод, подсчитывающий топ %, в который
+        /// попал игрок после завершения игры
+        /// </summary>
+        /// <param name="_leaderboard">Список всех лидеров</param>
+        /// <param name="_newAttempts">Количество попыток текущего игрока</param>
+        /// <returns>Топ % текущего игрока</returns>
+        public static double CalculateTopPercentage(List<LeaderInfo> _leaderboard, int _newAttempts)
         {
-            double totalPlayers = leaderboard.Count;
-            double betterPlayers = leaderboard.Count(x => x.Score < newAttempts);
-            double tiePlayers = leaderboard.Count(x => x.Score == newAttempts);
-            double percentage = 0;
-            if (totalPlayers > 1)
-            {
-                percentage = ((betterPlayers+tiePlayers) / (totalPlayers)) * 100;
-            }
-            else { percentage = 1; }
-            return percentage;
-        }
+            double _totalPlayers = _leaderboard.Count;
 
-        public class LeaderInfo
-        {
-            public string Name { get; set; }
-            public int Score { get; set; }
-            public DateTime Date { get; set; }
+            // Подсчет игроков, у которых число попыток меньше
+            double _betterPlayers = _leaderboard.Count(x => x.Score < _newAttempts);
+
+            // Подсчет игроков, у которых такое же число попыток
+            double _tiePlayers = _leaderboard.Count(x => x.Score == _newAttempts);
+
+            // Подсчет процента топа
+            double _percentage = 0;
+            if (_totalPlayers > 1)
+            {
+                _percentage = ((_betterPlayers+_tiePlayers) / (_totalPlayers)) * 100;
+            }
+            else { _percentage = 1; }
+            return _percentage;
         }
     }
 }

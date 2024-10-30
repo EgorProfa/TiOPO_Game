@@ -17,7 +17,11 @@
 mono_crash.*
 
 # Build results
-bin/Debug/4digit_guess.exe
+Debug/4digit_guess.exe
+Debug/4digit_geuss.exe.config
+Debug/4digit_guess.pdb
+Debug/Newtonsoft.Json.dll
+Debug/Newtonsoft.Json
 [Dd]ebugPublic/
 [Rr]elease/
 [Rr]eleases/
