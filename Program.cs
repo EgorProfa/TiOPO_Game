@@ -57,7 +57,7 @@ namespace _4digit_guess
                 if (_correctPosition == 4)
                 {
                     Console.WriteLine($"Вы угадали число {_secretNumber} за {_attempts} попыток.");
-                    UpdateLeaderboard(_user.Username, _attempts);
+                    UpdateLeaderboard(_userAuth.GetCurrentUsername(), _attempts);
                     Console.ReadKey();
                     break;
                 }
